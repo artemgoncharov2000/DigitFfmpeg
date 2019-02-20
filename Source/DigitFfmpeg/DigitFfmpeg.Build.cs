@@ -49,8 +49,26 @@ public class DigitFfmpeg : ModuleRules
 
         string LibrariesPath = Path.Combine(FfmpegPath, "lib");
         string IncludePath = Path.Combine(FfmpegPath, "include");
+        string DllPath = Path.Combine(FfmpegPath, "dll");
 
         PrivateIncludePaths.Add(IncludePath);
+
+        string[] dll = new string[]
+        {
+            "avcodec-58.dll",
+            "avdevice-58.dll",
+            "avfilter-7.dll",
+            "avformat-58.dll",
+            "avutil-56.dll",
+            "postproc-55.dll",
+            "swresample-3.dll",
+            "swscale-5.dll"
+        };
+
+        foreach (var VARIABLE in dll)
+        {
+            PublicDelayLoadDLLs.Add(Path.Combine(DllPath, VARIABLE));
+        }
 
         string[] lib = new string[]
         {
@@ -68,6 +86,8 @@ public class DigitFfmpeg : ModuleRules
         {
             PublicAdditionalLibraries.Add(Path.Combine(LibrariesPath, VARIABLE));
         }
+
+
 
         DynamicallyLoadedModuleNames.AddRange(
 			new string[]
