@@ -73,7 +73,7 @@ public class DigitFfmpeg : ModuleRules
         string IncludePath = Path.Combine(FfmpegPath, "include");
         string DllPath = Path.Combine(FfmpegPath, "bin", Platform);
 
-
+        PublicLibraryPaths.Add(LibrariesPath);
 
         string[] lib = new string[]
         {
@@ -90,7 +90,8 @@ public class DigitFfmpeg : ModuleRules
 
         foreach (string VARIABLE in lib)
         {
-            PublicAdditionalLibraries.Add(Path.Combine(LibrariesPath, VARIABLE));
+            PublicAdditionalLibraries.Add(VARIABLE);
+
         }
 
         string[] dlls = new string[]
@@ -109,9 +110,9 @@ public class DigitFfmpeg : ModuleRules
         foreach (string VARIABLE in dlls)
         {
 
-            //PublicDelayLoadDLLs.Add(VARIABLE);
-            //CopyToBinaries(Path.Combine(DllPath, VARIABLE), Target);
-            RuntimeDependencies.Add((Path.Combine(DllPath, VARIABLE)));
+            PublicDelayLoadDLLs.Add(VARIABLE);
+            CopyToBinaries(Path.Combine(DllPath, VARIABLE), Target);
+            RuntimeDependencies.Add(new RuntimeDependency(Path.Combine(DllPath, VARIABLE)));
         }
 
         PrivateIncludePaths.Add(IncludePath);

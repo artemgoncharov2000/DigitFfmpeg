@@ -25,7 +25,8 @@ public:
 	UFUNCTION(BlueprintCallable)
 	static UDigitFfmpegCore* CreateDigitFfmpeg(FString url);
 
-	bool Init();
+	UFUNCTION(BlueprintCallable)
+		bool Init();
 
 private:
 
