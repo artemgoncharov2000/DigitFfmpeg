@@ -16,7 +16,7 @@
   "Modules": [
     {
       "Name": "DigitFfmpeg",
-      "Type": "Developer",
+      "Type": "Runtime",
       "LoadingPhase": "PreLoadingScreen"
     }
   ]
