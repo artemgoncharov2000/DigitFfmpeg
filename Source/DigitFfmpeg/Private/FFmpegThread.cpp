@@ -8,13 +8,12 @@ extern "C" {
 }
 
 FFmpegThread::FFmpegThread(FString url) : device_url(url),
-m_decoder(nullptr),
-m_decoder_context(nullptr),
-m_format_context(nullptr),
-m_frame(nullptr),
-m_buffer_frame_data(0)
+                                          m_decoder(nullptr),
+                                          m_decoder_context(nullptr),
+                                          m_format_context(nullptr), device(nullptr),
+                                          m_frame(nullptr),
+                                          m_buffer_frame_data(0), m_packet()
 {
-
 }
 
 FFmpegThread::~FFmpegThread()
