@@ -2,6 +2,7 @@
 
 #include "CoreMinimal.h"
 #include "Runtime/Core/Public/HAL/Runnable.h"
+#include <vector>
 
 extern "C" {
 #include <ThirdParty/ffmpeg/include/libavcodec/avcodec.h>
@@ -35,10 +36,9 @@ private:
 	AVCodec* m_decoder;
 	AVCodecContext* m_decoder_context;
 	AVFormatContext* m_format_context;
-
 	AVInputFormat* device;
 
 	AVFrame* m_frame;
-	uint8_t m_buffer_frame_data;
+	std::vector<uint8_t> m_buffer_frame_data;
 	AVPacket m_packet{};
 };
