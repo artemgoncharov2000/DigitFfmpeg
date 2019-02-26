@@ -7,8 +7,10 @@ UDigitFfmpegCore::UDigitFfmpegCore()
 
 UDigitFfmpegCore::~UDigitFfmpegCore()
 {
-	if (Thread)
+	if (Thread) {
 		Thread->Kill();
+		Thread->WaitForCompletion();
+	}
 }
 
 UDigitFfmpegCore* UDigitFfmpegCore::CreateDigitFfmpeg(FString url)

@@ -23,15 +23,12 @@ public:
 	void Exit() override;
 	void Stop() override;
 
-	bool bWorkingThread = true;
 private:
-	
+
+	bool bWorkingThread = true;
 	bool bInit = false;
 
-
 	FString device_url;
-
-	int m_video_index;
 
 	AVCodec* m_decoder;
 	AVCodecContext* m_decoder_context;
@@ -40,5 +37,5 @@ private:
 
 	AVFrame* m_frame;
 	std::vector<uint8_t> m_buffer_frame_data;
-	AVPacket m_packet{};
+	AVPacket m_packet;
 };
