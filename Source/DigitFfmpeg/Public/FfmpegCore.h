@@ -20,9 +20,14 @@ public:
 	UFUNCTION(BlueprintCallable)
 	static UDigitFfmpegCore* CreateDigitFfmpeg(FString url);
 
+	UFUNCTION(BlueprintPure)
+	UTexture2D* GetTexture();
+
 private:
 
 	TSharedPtr<FFmpegThread> ffmpeg_thread;
 	FRunnableThread* Thread;
-
+	
+	UPROPERTY()
+	UTexture2D* Texture;
 };

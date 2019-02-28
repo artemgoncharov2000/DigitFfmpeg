@@ -1,5 +1,6 @@
 #include "FFmpegThread.h"
 #include "Runtime/Core/Public/HAL/PlatformProcess.h"
+#include "Engine/Texture2DDynamic.h"
 
 extern "C" {
 #include <libavutil/opt.h>
@@ -7,12 +8,13 @@ extern "C" {
 #include <libavutil/imgutils.h>
 }
 
-FFmpegThread::FFmpegThread(FString url) : device_url(url),
-                                          m_decoder(nullptr),
-                                          m_decoder_context(nullptr),
-                                          m_format_context(nullptr), device(nullptr),
-                                          m_frame(nullptr),
-                                          m_buffer_frame_data(0), m_packet()
+FFmpegThread::FFmpegThread(FString url, UTexture2D* texture) : device_url(url),
+                                                               TextureVideo(texture),
+                                                               m_decoder(nullptr),
+                                                               m_decoder_context(nullptr),
+                                                               m_format_context(nullptr), device(nullptr),
+                                                               m_frame(nullptr),
+                                                               m_buffer_frame_data(0), sws_context(nullptr)
 {
 }
 
@@ -86,9 +88,12 @@ uint32 FFmpegThread::Run()
 			m_decoder_context->time_base.den = 1000;
 		}
 
-		const auto format = AV_PIX_FMT_RGB24;
-
+		const auto format = AV_PIX_FMT_RGBA;
 		const FVector2D m_size(m_decoder_context->width, m_decoder_context->height);
+
+		sws_context = sws_getContext(m_decoder_context->width, m_decoder_context->height, m_decoder_context->pix_fmt,
+			m_size.X, m_size.Y, format,
+			SWS_BICUBIC, nullptr, nullptr, nullptr);
 
 		m_frame = av_frame_alloc();
 
@@ -97,6 +102,7 @@ uint32 FFmpegThread::Run()
 		m_frame->format = format;
 
 		const auto size = av_image_get_buffer_size(format, m_frame->width, m_frame->height, 1);
+		bufferTexture.AddUninitialized(size);
 
 		if (size < 0)
 			return -8;
@@ -114,6 +120,40 @@ uint32 FFmpegThread::Run()
 
 		if (!bInit)
 			continue;
+
+		if(av_read_frame(m_format_context, &m_packet) < 0)
+		{
+			continue;
+		}
+
+		if(avcodec_send_packet(m_decoder_context, &m_packet) < 0)
+		{
+			continue;
+		}
+
+
+		AVFrame* frame = av_frame_alloc();
+
+		if (avcodec_receive_frame(m_decoder_context, frame) < 0)
+		{
+			UE_LOG(LogTemp, Log, TEXT("NOOOO"));
+			av_frame_free(&frame);
+			continue;
+		}
+
+		sws_scale(sws_context, frame->data, frame->linesize, 0, m_decoder_context->height, m_frame->data, m_frame->linesize);
+
+		FMemory::Memcpy(bufferTexture.GetData(), m_frame->data[0], bufferTexture.Num());
+
+		UE_LOG(LogTemp, Log, TEXT("%i"), bufferTexture.Num());
+
+		FUpdateTextureRegion2D* test = new FUpdateTextureRegion2D();
+		test->Height = static_cast<uint32>(frame->height);
+		test->Width = static_cast<uint32>(frame->width);
+		TextureVideo->UpdateTextureRegions(0, 0, test, frame->coded_picture_number, bufferTexture.Num(), bufferTexture.GetData());
+
+		av_frame_free(&frame);
+		av_packet_unref(&m_packet);
 
 
 	}

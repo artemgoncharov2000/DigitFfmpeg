@@ -2,6 +2,7 @@
 
 #include "CoreMinimal.h"
 #include "Runtime/Core/Public/HAL/Runnable.h"
+#include "Engine/Texture2D.h"
 #include <vector>
 
 extern "C" {
@@ -15,7 +16,7 @@ class FFmpegThread : public FRunnable
 {
 public:
 	
-	FFmpegThread(FString url);
+	FFmpegThread(FString url, UTexture2D* texture);
 	~FFmpegThread();
 
 	bool Init() override;
@@ -30,6 +31,8 @@ private:
 
 	FString device_url;
 
+	TArray<uint8> bufferTexture;
+
 	AVCodec* m_decoder;
 	AVCodecContext* m_decoder_context;
 	AVFormatContext* m_format_context;
@@ -37,5 +40,8 @@ private:
 
 	AVFrame* m_frame;
 	std::vector<uint8_t> m_buffer_frame_data;
-	AVPacket m_packet;
+	AVPacket m_packet{};
+	SwsContext* sws_context;
+	UTexture2D* TextureVideo;
+	//IImageWrapper* ImgWrap;
 };
